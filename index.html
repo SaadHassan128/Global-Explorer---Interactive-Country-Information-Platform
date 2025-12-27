@@ -1,31 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="style.css" />
-    <script defer src="script.js"></script>
-    <title>Asynchronous JavaScript</title>
-  </head>
-  <body>
-    <main class="container">
-      <div class="countries">
-        <!--
-        <article class="country">
-          <img class="country__img" src="" />
-          <div class="country__data">
-            <h3 class="country__name">COUNTRY</h3>
-            <h4 class="country__region">REGION</h4>
-            <p class="country__row"><span>👫</span>POP people</p>
-            <p class="country__row"><span>🗣️</span>LANG</p>
-            <p class="country__row"><span>💰</span>CUR</p>
-          </div>
-        </article>
-        -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- SEO Meta Tags -->
+  <title>Global Explorer | Discover Countries Worldwide with Interactive 3D Globe</title>
+  <meta name="description" content="Explore countries around the world with our interactive 3D globe. Get real-time information about populations, languages, currencies, and neighboring countries.">
+  <meta name="keywords" content="countries, world map, 3D globe, geography, country information, population, languages, currencies">
+  <meta name="author" content="Global Explorer">
+  <link rel="canonical" href="https://globalexplorer.com">
+
+  <!-- Open Graph Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Global Explorer | Interactive 3D Country Information">
+  <meta property="og:description" content="Discover countries worldwide with our stunning 3D interactive globe. Explore populations, languages, and cultures.">
+  <meta property="og:url" content="https://globalexplorer.com">
+  <meta property="og:site_name" content="Global Explorer">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Global Explorer | Interactive 3D Country Information">
+  <meta name="twitter:description" content="Discover countries worldwide with our stunning 3D interactive globe.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+
+  <!-- Preconnect to external resources -->
+  <link rel="preconnect" href="https://restcountries.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Three.js for 3D Globe -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Fallback Data -->
+  <script src="countries-fallback.js"></script>
+
+  <!-- Main Script -->
+  <script defer src="script.js"></script>
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Global Explorer",
+    "description": "Interactive 3D globe for exploring country information worldwide",
+    "url": "https://globalexplorer.com",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Skip to main content for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading Global Explorer...</p>
+  </div>
+
+  <!-- Header with Navigation -->
+  <header class="header" id="header">
+    <nav class="nav container" aria-label="Main navigation">
+      <div class="nav__logo">
+        <span class="nav__logo-icon">🌍</span>
+        <span class="nav__logo-text">Global Explorer</span>
       </div>
-      <button class="btn-country">Where am I?</button>
-      <div class="images"></div>
-    </main>
-  </body>
+
+      <div class="nav__menu" id="nav-menu">
+        <ul class="nav__list">
+          <li class="nav__item">
+            <a href="#home" class="nav__link active">Home</a>
+          </li>
+          <li class="nav__item">
+            <a href="#globe" class="nav__link">Globe</a>
+          </li>
+          <li class="nav__item">
+            <a href="#countries" class="nav__link">Countries</a>
+          </li>
+          <li class="nav__item">
+            <a href="#favorites" class="nav__link">
+              <span class="nav__favorites-badge" id="favorites-count">0</span>
+              Favorites
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav__actions">
+        <!-- Dark Mode Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <span class="theme-toggle__icon">🌙</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="hero__container container">
+        <div class="hero__content">
+          <h1 class="hero__title">
+            Discover the World
+            <span class="hero__title-gradient">One Country at a Time</span>
+          </h1>
+          <p class="hero__description">
+            Explore an interactive 3D globe with real-time country information, population data, languages, and more. Your journey around the world starts here.
+          </p>
+          <div class="hero__cta">
+            <button class="btn btn--primary" id="explore-btn" aria-label="Explore countries">
+              <span class="btn__icon">🚀</span>
+              Start Exploring
+            </button>
+            <button class="btn btn--secondary" id="where-am-i-btn" aria-label="Find my location">
+              <span class="btn__icon">📍</span>
+              Where Am I?
+            </button>
+          </div>
+
+          <!-- Stats Counter -->
+          <div class="hero__stats">
+            <div class="stat">
+              <span class="stat__number" data-target="195">0</span>
+              <span class="stat__label">Countries</span>
+            </div>
+            <div class="stat">
+              <span class="stat__number" data-target="7900">0</span>
+              <span class="stat__label">Languages</span>
+            </div>
+            <div class="stat">
+              <span class="stat__number" data-target="180">0</span>
+              <span class="stat__label">Currencies</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <div class="hero__globe-placeholder">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring pulse-ring--delayed"></div>
+            <span class="hero__globe-icon">🌍</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="scroll-indicator">
+        <span class="scroll-indicator__text">Scroll to explore</span>
+        <div class="scroll-indicator__arrow">↓</div>
+      </div>
+    </section>
+
+    <!-- 3D Globe Section -->
+    <section class="globe-section" id="globe">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Interactive 3D Globe</h2>
+          <p class="section-subtitle">Click and drag to rotate • Click on countries to explore</p>
+        </div>
+
+        <div class="globe-container">
+          <canvas id="globe-canvas" class="globe-canvas"></canvas>
+          <div class="globe-controls">
+            <button class="globe-control-btn" id="reset-globe" aria-label="Reset globe view">
+              <span>🔄 Reset View</span>
+            </button>
+            <button class="globe-control-btn" id="toggle-rotation" aria-label="Toggle auto rotation">
+              <span>⏸️ Pause Rotation</span>
+            </button>
+          </div>
+
+          <!-- Globe Loading State -->
+          <div class="globe-loading" id="globe-loading">
+            <div class="spinner"></div>
+            <p>Loading 3D Globe...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search & Filter Section -->
+    <section class="search-section" id="countries">
+      <div class="container">
+        <div class="search-container">
+          <!-- Search Bar -->
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input
+              type="text"
+              class="search-input"
+              id="search-input"
+              placeholder="Search for a country..."
+              aria-label="Search countries"
+              autocomplete="off"
+            >
+            <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
+          </div>
+
+          <!-- Filter Controls -->
+          <div class="filters">
+            <div class="filter-group">
+              <label for="region-filter" class="filter-label">Region:</label>
+              <select id="region-filter" class="filter-select" aria-label="Filter by region">
+                <option value="all">All Regions</option>
+                <option value="Africa">Africa</option>
+                <option value="Americas">Americas</option>
+                <option value="Asia">Asia</option>
+                <option value="Europe">Europe</option>
+                <option value="Oceania">Oceania</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="sort-filter" class="filter-label">Sort by:</label>
+              <select id="sort-filter" class="filter-select" aria-label="Sort countries">
+                <option value="name">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="population">Population (High-Low)</option>
+                <option value="population-asc">Population (Low-High)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Countries Grid Section -->
+    <section class="countries-section">
+      <div class="container">
+        <!-- Results Info -->
+        <div class="results-info">
+          <p class="results-text" id="results-text">
+            Showing <span id="results-count">0</span> countries
+          </p>
+        </div>
+
+        <!-- Countries Grid -->
+        <div class="countries-grid" id="countries-grid">
+          <!-- Skeleton Loading Cards -->
+          <div class="skeleton-cards" id="skeleton-cards">
+            <div class="country-card skeleton" aria-hidden="true">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--subtitle"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+              </div>
+            </div>
+            <div class="country-card skeleton" aria-hidden="true">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--subtitle"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+              </div>
+            </div>
+            <div class="country-card skeleton" aria-hidden="true">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--subtitle"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Country Cards will be inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+          <div class="empty-state__icon">🔍</div>
+          <h3 class="empty-state__title">No countries found</h3>
+          <p class="empty-state__text">Try adjusting your search or filters</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Favorites Section -->
+    <section class="favorites-section" id="favorites">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">My Favorites</h2>
+          <p class="section-subtitle">Countries you've bookmarked for quick access</p>
+        </div>
+
+        <div class="favorites-grid" id="favorites-grid">
+          <div class="empty-state">
+            <div class="empty-state__icon">⭐</div>
+            <h3 class="empty-state__title">No favorites yet</h3>
+            <p class="empty-state__text">Click the star icon on any country card to add it to your favorites</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Country Detail Modal -->
+  <div class="modal" id="country-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__overlay"></div>
+    <div class="modal__content">
+      <button class="modal__close" id="modal-close" aria-label="Close modal">×</button>
+      <div class="modal__body" id="modal-body">
+        <!-- Dynamic content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <span class="toast__icon"></span>
+    <span class="toast__message"></span>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <span>↑</span>
+  </button>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__content">
+        <div class="footer__logo">
+          <span class="footer__logo-icon">🌍</span>
+          <span class="footer__logo-text">Global Explorer</span>
+        </div>
+        <p class="footer__text">
+          Explore the world's countries with real-time data and interactive visualizations.
+        </p>
+        <div class="footer__credits">
+          <p>Data provided by <a href="https://restcountries.com" target="_blank" rel="noopener noreferrer">REST Countries API</a></p>
+          <p>&copy; 2025 Global Explorer. Built with passion for geography.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+</body>
 </html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .test { background: white; padding: 20px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #667eea; color: white; border: none; border-radius: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 API Endpoint Testing</h1>
+
+    <div class="test">
+        <h2>Testing Multiple Endpoints...</h2>
+        <div id="results"></div>
+        <button onclick="location.reload()">🔄 Retry</button>
+    </div>
+
+    <script>
+        const endpoints = [
+            'https://restcountries.com/v2/all',
+            'https://restcountries.eu/rest/v2/all',
+            'https://restcountries.com/v3.1/all'
+        ];
+
+        const resultsDiv = document.getElementById('results');
+
+        async function testEndpoint(url, index) {
+            const div = document.createElement('div');
+            div.style.padding = '10px';
+            div.style.margin = '5px 0';
+            div.style.background = '#f9f9f9';
+            div.innerHTML = `<p>Testing ${index + 1}/${endpoints.length}: ${url}...</p>`;
+            resultsDiv.appendChild(div);
+
+            try {
+                const start = Date.now();
+                const response = await fetch(url);
+                const data = await response.json();
+                const time = Date.now() - start;
+
+                div.innerHTML = `
+                    <p class="success">✅ SUCCESS!</p>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Countries:</strong> ${data.length}</p>
+                    <p><strong>Response Time:</strong> ${time}ms</p>
+                    <p><strong>First Country:</strong> ${data[0].name?.common || data[0].name}</p>
+                `;
+                return true;
+            } catch (error) {
+                div.innerHTML = `
+                    <p class="error">❌ FAILED</p>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                return false;
+            }
+        }
+
+        async function runTests() {
+            for (let i = 0; i < endpoints.length; i++) {
+                const success = await testEndpoint(endpoints[i], i);
+                if (success) {
+                    resultsDiv.innerHTML += '<p class="success" style="font-size: 20px; margin-top: 20px;">✅ Found working endpoint! The app should work now.</p>';
+                    break;
+                }
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+</html>
